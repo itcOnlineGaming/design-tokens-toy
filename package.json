@@ -1,0 +1,12 @@
+{
+	"name": "design-tokens-toy",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "node build.mjs"
+	},
+	"devDependencies": {
+		"style-dictionary": "^4.0.0"
+	}
+}

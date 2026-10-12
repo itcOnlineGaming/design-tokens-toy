@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Design Tokens Toy</title>
+	<link rel="stylesheet" href="dist/tokens.css?v=1791812771761" />
+	<style>
+		body {
+			margin: 0;
+			padding: 2rem;
+			background: var(--color-surface);
+			color: var(--color-text);
+			font-family: system-ui, sans-serif;
+			transition: background 0.2s, color 0.2s;
+		}
+		button {
+			background: var(--color-brand);
+			color: white;
+			border: none;
+			padding: 0.6rem 1.2rem;
+			border-radius: 6px;
+			font-size: 1rem;
+			cursor: pointer;
+		}
+		.swatches {
+			display: flex;
+			gap: 1rem;
+			margin-top: 1.5rem;
+		}
+		.swatch {
+			width: 80px;
+			height: 80px;
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-size: 0.75rem;
+			font-family: monospace;
+		}
+	</style>
+</head>
+<body>
+	<h1>Design Tokens Toy</h1>
+	<p>Edit <code>tokens.json</code> (in Figma, or by hand), run <code>npm run build</code>, then reload this page.</p>
+	<button id="toggle">Toggle dark mode</button>
+	<div class="swatches">
+		<div class="swatch" style="background: var(--blue-500)">--blue-500</div>
+		<div class="swatch" style="background: var(--color-brand)">--color-brand</div>
+		<div class="swatch" style="background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-text)">--color-surface</div>
+	</div>
+	<script>
+		document.getElementById('toggle').onclick = () => {
+			const html = document.documentElement;
+			html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+		};
+	</script>
+</body>
+</html>
