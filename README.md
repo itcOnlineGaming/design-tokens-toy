@@ -45,15 +45,20 @@ Variables can be exported/imported as DTCG-flavored JSON through:
 - Figma's own Variables REST API, which can import/export in a
   DTCG-compatible shape.
 
-Caveat to check after any Figma round-trip: the `$extensions["com.toy.css"]`
-block (the literal `--css-name`) is not a standard DTCG field, and most
-Figma tooling won't know to preserve it since it's custom to this setup. If a
-re-exported `tokens.json` is missing those names, either:
-- add the `$extensions` block back by hand for any new/renamed tokens, or
-- use Tokens Studio's token name as the source and change `cssName()` in
-  `build.mjs` to derive `--the-token-name` from `token.path.join('-')`
-  instead of reading `$extensions` (simpler, but then renaming a Figma
-  token/group also renames its CSS variable).
+The `$extensions["com.toy.css"]` block (the literal `--css-name`) is not a
+standard DTCG field. Copying the JSON out of Tokens Studio's `{}` view keeps
+it, but a token *added* in Figma won't have one. For those, `cssName()` in
+`build.mjs` falls back to a name derived from the token's path:
+
+- `color.blue.600` → `--blue-600`
+- `semantic.light.accent` / `semantic.dark.accent` → `--color-accent`
+  (theme dropped, so both themes share one variable)
+
+A new token anywhere else (e.g. `spacing.md`) is not written to the CSS until
+`build.mjs` gets a block filter for it (and, if it has no `$extensions` name,
+a naming rule in `cssName()`). Tokens with a stored name keep it, so
+reorganizing them never renames a `var()`; tokens using the derived name do
+get a new CSS variable if renamed or moved in Figma.
 
 Workflow once that's sorted:
 

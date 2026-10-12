@@ -4,7 +4,8 @@
 //
 // Each token names its own CSS custom property in $extensions["com.toy.css"].name,
 // kept separate from the token's JSON path, so reorganizing tokens.json never
-// renames a var() already used in CSS. Aliases ({color.blue.500}) are resolved
+// renames a var() already used in CSS. Tokens without that extension (e.g. new
+// ones added in Figma) get a name derived from their path; see cssName(). Aliases ({color.blue.500}) are resolved
 // by Style Dictionary and written back out as var(--blue-500) so the cascade
 // still works and the build fails loudly if a reference points nowhere.
 import StyleDictionary from 'style-dictionary';
@@ -16,7 +17,21 @@ const here = dirname(fileURLToPath(import.meta.url));
 const HEADER = '/* Generated from tokens.json — do not edit by hand */';
 const EXTENSION = 'com.toy.css';
 
-const cssName = (token) => token.$extensions[EXTENSION].name;
+/**
+ * A token's CSS custom property name: $extensions["com.toy.css"].name when present,
+ * otherwise derived from its path, so tokens added in Figma (which can't set the
+ * extension) still build:
+ *   color.blue.600          -> --blue-600
+ *   semantic.<theme>.accent -> --color-accent  (same name in every theme)
+ */
+function cssName(token) {
+	const stored = token.$extensions?.[EXTENSION]?.name;
+	if (stored) return stored;
+	const [group, ...rest] = token.path;
+	if (group === 'color') return `--${rest.join('-')}`;
+	if (group === 'semantic') return `--color-${rest.slice(1).join('-')}`;
+	throw new Error(`No CSS name for token ${token.path.join('.')}: add $extensions["${EXTENSION}"].name`);
+}
 
 /** Resolve a token's own value to CSS text: var(--x) for an alias, the literal otherwise. */
 function cssValue(token, byPath) {
